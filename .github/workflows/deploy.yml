@@ -1,32 +1,37 @@
-name: Deploy to DigitalOcean
+name: Deploy to Azure VM
 
 on:
-  push:
-    branches: [ main ]
-
+    push:
+        branches: [ main ]
+    
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.KEY }}
-          port: 22
-          script: |
-            # Garante que a pasta do projeto existe
-            mkdir -p ~/app-flask
-            cd ~/app-flask
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Deploy via SSH
+            uses: appleboy/ssh-action@master
+            with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USER }}
+                key: ${{ secrets.KEY }}
+                port: 22
+                script: |
+                    # 1. [ ] Garante que a pasta existe e entra nela
+                    mkdir -p ~/app
+                    cd ~/app
 
-            # Lógica de Git: Clona se não existir, senão atualiza
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/${{ github.repository }}.git .
-            else
-              git pull origin main
-            fi
+                    # 2. [ ] Limpeza brutal (Mata qualquer container antigo rodando)
+                    docker rm -f $(docker ps -aq) || true
+                    
+                    # 3. [ ] LÓGICA DE OURO: Clona na 1ª vez, Atualiza nas próximas
+                    if [ ! -d ".git" ]; then
+                        echo "Clonando repositorio pela primeira vez..."
+                        git clone https://github.com/SEU_USER/SEU_REPO.git .
+                    else
+                        echo "Atualizando repositorio existente..."
+                        git pull origin main
+                    fi
 
-            # Sobe os containers (Caddy + Flask)
-            # O --build garante que o Dockerfile do Flask seja reconstruído se houver mudanças no código
-            docker compose up -d --build
+                    # 4. [ ] Sobe a nova versão
+                    docker compose down
+                    docker compose up -d --build
