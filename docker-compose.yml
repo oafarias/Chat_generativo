@@ -10,7 +10,7 @@ services:
     networks:
       - aaleff_network
     volumes:
-      - static_volume:/app/static
+      - static_volume:/app/staticfiles
 
   caddy:
     image: caddy:latest
