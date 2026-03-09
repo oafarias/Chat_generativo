@@ -1,9 +1,28 @@
 version: '3.8'
 
 services:
-    web:
-        build: .
-        #Mapeia a porta 80 da VM para a 5000 do container
-        ports:
-          - "80:5000"
-        restart: always
+  # Seu container de aplicação Flask
+  web:
+    build: .
+    restart: always
+    environment:
+      - FLASK_ENV=production
+    # Não expomos porta aqui para a internet, o Caddy cuidará disso internamente
+
+  # O "Roteador" que gerencia SSL e redireciona o tráfego
+  caddy:
+    image: caddy:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:
