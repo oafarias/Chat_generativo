@@ -16,8 +16,9 @@ jobs:
                 key: ${{ secrets.KEY }}
                 port: 22
                 script: |
-                    mkdir -p ~/app-teste # Cria o diretório do projeto se não existir
-                    cd ~/app-teste # Caminho onde o projeto está no droplet
+                    rm -rf ~/app-teste ~/app-flask # Limpa os diretórios antigos para evitar conflitos
+                    mkdir -p ~/app # Cria o diretório do projeto se não existir
+                    cd ~/app # Caminho onde o projeto está no droplet
 
                     # Lógica de Git: Clona se não existir, senão atualiza
                     if [ ! -d ".git" ]; then
