@@ -26,7 +26,7 @@ jobs:
                     # 3. [ ] LÓGICA DE OURO: Clona na 1ª vez, Atualiza nas próximas
                     if [ ! -d ".git" ]; then
                         echo "Clonando repositorio pela primeira vez..."
-                        git clone https://github.com/SEU_USER/SEU_REPO.git .
+                        git clone https://github.com/oafarias/Chat_generativo.git .
                     else
                         echo "Atualizando repositorio existente..."
                         git pull origin main
