@@ -22,10 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-j3*2o@t%9z)uzd9tx)na@$82c8s)&f#zx=aohesdhm!4-evtc*'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_TRUSTED_ORIGINS = ['https://aaleff.me', 'https://www.aaleff.me']
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['142.93.191.212', 'aaleff.me', 'www.aaleff.me', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['142.93.191.212', 'aaleff.me', 'www.aaleff.me', 'web', 'localhost', '127.0.0.1']
 
 
 # Application definition
