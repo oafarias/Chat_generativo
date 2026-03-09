@@ -1,11 +1,11 @@
 services:
   web:
     build: .
-    # O Caddy vai conversar com o web pela porta 5000 internamente.
-    # Se sua aplicação roda na 5000, não precisamos expor portas aqui 
+    # O Caddy vai conversar com o web pela porta 8000 internamente.
+    # Se sua aplicação roda na 8000, não precisamos expor portas aqui 
     # para o mundo externo, o Caddy cuidará disso.
     expose:
-      - "5000"
+      - "8000"
     restart: always
     networks:
       - aaleff_network
