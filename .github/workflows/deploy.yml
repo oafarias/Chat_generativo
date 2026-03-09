@@ -31,11 +31,13 @@ jobs:
             fi
 
             # 3. FAXINA: Mata containers órfãos que possam estar segurando a porta 80
-            # O "|| true" evita que o script pare caso não existam containers rodando
             docker stop $(docker ps -q) 2>/dev/null || true
             docker rm $(docker ps -aq) 2>/dev/null || true
 
             # 4. Sobe a versão nova do Django
-            # O --build reconstrói a imagem com o novo Python 3.11 e requirements
             docker compose down
             docker compose up -d --build
+
+            # 5. AUTOMAÇÃO: Roda as migrations para criar as tabelas no banco
+            echo "Rodando migrations..."
+            docker compose exec -T web python manage.py migrate --noinput
