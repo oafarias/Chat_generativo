@@ -1,4 +1,4 @@
-name: Deploy to Azure VM
+name: Deploy to DigitalOcean Droplet
 
 on:
     push:
@@ -16,22 +16,15 @@ jobs:
                 key: ${{ secrets.KEY }}
                 port: 22
                 script: |
-                    # 1. [ ] Garante que a pasta existe e entra nela
-                    mkdir -p ~/app
-                    cd ~/app
+            cd ~/app-flask # Caminho onde o projeto está no droplet
 
-                    # 2. [ ] Limpeza brutal (Mata qualquer container antigo rodando)
-                    docker rm -f $(docker ps -aq) || true
-                    
-                    # 3. [ ] LÓGICA DE OURO: Clona na 1ª vez, Atualiza nas próximas
-                    if [ ! -d ".git" ]; then
-                        echo "Clonando repositorio pela primeira vez..."
-                        git clone https://github.com/oafarias/Chat_generativo.git .
-                    else
-                        echo "Atualizando repositorio existente..."
-                        git pull origin main
-                    fi
+            # Lógica de Git: Clona se não existir, senão atualiza
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }}.git .
+            else
+              git pull origin main
+            fi
 
-                    # 4. [ ] Sobe a nova versão
-                    docker compose down
-                    docker compose up -d --build
+            # Sobe os containers (Caddy + Flask)
+            # O --build garante que o Dockerfile do Flask seja reconstruído se houver mudanças no código
+            docker compose up -d --build
