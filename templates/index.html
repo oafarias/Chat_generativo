@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIWA | Atendimento</title>
     <link data-react-helmet="true" rel="icon" type="png" sizes="16x16" href="https://aiwa.vteximg.com.br/arquivos/favicon_16x16_aiwa.ico"/>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.2">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.3">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 </head>
 <body>
     <div class="chat-wrapper">
@@ -31,9 +32,11 @@
             </div>
         </main>
 
+        <emoji-picker id="emoji-picker-box" class="emoji-picker-hidden"></emoji-picker>
+
         <footer class="chat-input-area">
             <div class="input-container">
-                <button class="emoji-btn">😊</button>
+                <button id="emoji-btn" class="emoji-btn">😊</button>
                 <input type="text" id="user-input" placeholder="Digite uma mensagem..." autocomplete="off">
                 <button id="send-btn" class="send-btn">➔</button>
             </div>

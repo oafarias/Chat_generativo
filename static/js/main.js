@@ -3,18 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const protocoloSpan = document.getElementById('protocolo');
+    const emojiBtn = document.getElementById('emoji-btn');
+    const emojiPickerBox = document.getElementById('emoji-picker-box');
 
-    // Gera um protocolo baseado na data (igual ao seu print)
+    // Gera um protocolo baseado na data
     const data = new Date();
     const protocolo = data.getFullYear() + String(data.getMonth() + 1).padStart(2, '0') + String(data.getDate()).padStart(2, '0') + "02360879";
-    protocoloSpan.innerText = protocolo;
+    if(protocoloSpan) protocoloSpan.innerText = protocolo;
 
     function addMessage(text, type) {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${type}`;
         msgDiv.innerHTML = `
-            ${type === 'bot' ? '<img src="https://www.gravatar.com/avatar/000?d=mp" class="avatar">' : ''}
+            ${type === 'bot' ? '<img src="https://mkbr.xgen.com.br/mkbr/chatng/assets/img/avatar-aiwa.png" class="avatar">' : ''}
             <div class="bubble">${text}</div>
             <span class="time">${time}</span>
         `;
@@ -28,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(text, 'user');
             userInput.value = '';
             
-            // Simula resposta do bot após 1 segundo
             setTimeout(() => {
                 if(text.toLowerCase() === 'sim') {
                     addMessage("Para prosseguirmos com o atendimento, me informe o seu nome.", "bot");
@@ -39,5 +40,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendBtn.click();
+    });
+
+    // Lógica do Seletor de Emojis
+    emojiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        emojiPickerBox.classList.toggle('emoji-picker-hidden');
+    });
+
+    document.addEventListener('click', () => {
+        emojiPickerBox.classList.add('emoji-picker-hidden');
+    });
+
+    emojiPickerBox.addEventListener('click', (e) => { e.stopPropagation(); });
+
+    emojiPickerBox.addEventListener('emoji-click', event => {
+        const emoji = event.detail.unicode;
+        const startPos = userInput.selectionStart;
+        const endPos = userInput.selectionEnd;
+
+        userInput.value = userInput.value.substring(0, startPos) + emoji + userInput.value.substring(endPos);
+        userInput.setSelectionRange(startPos + emoji.length, startPos + emoji.length);
+        userInput.focus();
     });
 });
