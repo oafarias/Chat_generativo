@@ -4,25 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pipeline de Sucesso</title>
-    <link data-react-helmet="true" rel="icon" type="png" sizes="16x16" href="https://aiwa.vteximg.com.br/arquivos/favicon_16x16_aiwa.ico"/>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1"> 
+    <title>AIWA | Atendimento</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.2">
 </head>
 <body>
-    <div class="container">
-        <div class="glow-box">
-            <h1 class="glitch" data-text="Deploy Concluído!">Deploy Concluído!</h1>
-            <span id="typewriter" class="status-text typewriter"></span>
-            <div class="badges">
-                <span class="badge azure">Azure VM</span>
-                <span class="badge docker">Docker</span>
-                <span class="badge github">GitHub Actions</span>
-                <span class="badge caddy">Caddy SSL</span>
+    <div class="chat-wrapper">
+        <header class="chat-header">
+            <img src="https://aiwa.com.br/arquivos/logo-aiwa.png" alt="Aiwa Logo" class="logo">
+            <div class="header-status">CHAT</div>
+            <div class="header-actions">
+                <button class="icon-btn">🔊</button>
+                <button class="icon-btn">➖</button>
+                <button class="icon-btn close">✕</button>
             </div>
-            <button id="action-btn" class="cyber-btn">Testar Conexão</button>
-        </div>
+        </header>
+
+        <main class="chat-messages" id="chat-box">
+            <div class="message bot">
+                <img src="https://www.gravatar.com/avatar/000?d=mp" class="avatar">
+                <div class="bubble">
+                    O seu protocolo para este atendimento é: <span id="protocolo"></span>.<br>
+                    Para que possamos seguir com o atendimento precisamos de alguns dados pessoais. O Sr(a). Está de acordo?
+                </div>
+                <span class="time">16:45</span>
+            </div>
+        </main>
+
+        <footer class="chat-input-area">
+            <div class="input-container">
+                <button class="emoji-btn">😊</button>
+                <input type="text" id="user-input" placeholder="Digite uma mensagem..." autocomplete="off">
+                <button id="send-btn" class="send-btn">➔</button>
+            </div>
+        </footer>
     </div>
 
-    <script src="{% static 'js/main.js' %}?v=1.1"></script>
+    <script src="{% static 'js/main.js' %}?v=1.2"></script>
 </body>
 </html>
