@@ -9,6 +9,8 @@ services:
     restart: always
     networks:
       - aaleff_network
+    volumes:
+      - static_volume:/app/static
 
   caddy:
     image: caddy:latest
@@ -21,6 +23,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+      - static_volume:/var/www/static:ro
     networks:
       - aaleff_network
     depends_on:
@@ -33,3 +36,4 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
+  static_volume:
