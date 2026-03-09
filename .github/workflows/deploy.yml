@@ -1,32 +1,41 @@
 name: Deploy to DigitalOcean Droplet
 
 on:
-    push:
-        branches: [ main ]
-    
+  push:
+    branches: [ main ]
+
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Deploy via SSH
-            uses: appleboy/ssh-action@master
-            with:
-                host: ${{ secrets.HOST }}
-                username: ${{ secrets.USER }}
-                key: ${{ secrets.KEY }}
-                port: 22
-                script: |
-                    rm -rf ~/app-teste ~/app-flask # Limpa os diretórios antigos para evitar conflitos
-                    mkdir -p ~/app # Cria o diretório do projeto se não existir
-                    cd ~/app # Caminho onde o projeto está no droplet
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          port: 22
+          script: |
+            # 1. Limpeza de diretórios antigos (Legacy)
+            rm -rf ~/app-teste ~/app-flask
+            mkdir -p ~/app
+            cd ~/app
 
-                    # Lógica de Git: Clona se não existir, senão atualiza
-                    if [ ! -d ".git" ]; then
-                    git clone https://github.com/${{ github.repository }}.git .
-                    else
-                    git pull origin main
-                    fi
+            # 2. Lógica de Git
+            if [ ! -d ".git" ]; then
+              echo "Clonando repositório..."
+              git clone https://github.com/${{ github.repository }}.git .
+            else
+              echo "Atualizando código..."
+              git pull origin main
+            fi
 
-                    # Sobe os containers (Caddy + Flask)
-                    # O --build garante que o Dockerfile do Flask seja reconstruído se houver mudanças no código
-                    docker compose up -d --build
+            # 3. FAXINA: Mata containers órfãos que possam estar segurando a porta 80
+            # O "|| true" evita que o script pare caso não existam containers rodando
+            docker stop $(docker ps -q) 2>/dev/null || true
+            docker rm $(docker ps -aq) 2>/dev/null || true
+
+            # 4. Sobe a versão nova do Django
+            # O --build reconstrói a imagem com o novo Python 3.11 e requirements
+            docker compose down
+            docker compose up -d --build
