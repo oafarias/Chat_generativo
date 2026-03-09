@@ -1,5 +1,22 @@
-aaleff.me, www.aaleff.me {
-    reverse_proxy web:5000
+# Redireciona www para root
+www.aaleff.me {
+    redir https://aaleff.me{uri}
+}
+
+aaleff.me {
+    # Servir arquivos estáticos diretamente pelo Caddy
+    # Substitua pelo caminho real dentro do container do Caddy
+    handle_path /static/* {
+        root * /var/www/static
+        file_server
+    }
+
+    # Proxy para o Gunicorn/Django
+    reverse_proxy web:5000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
     encode zstd gzip
 
     log {
