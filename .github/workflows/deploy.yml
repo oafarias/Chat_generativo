@@ -16,15 +16,16 @@ jobs:
                 key: ${{ secrets.KEY }}
                 port: 22
                 script: |
-            cd ~/app-teste # Caminho onde o projeto está no droplet
+                    mkdir -p ~/app-teste # Cria o diretório do projeto se não existir
+                    cd ~/app-teste # Caminho onde o projeto está no droplet
 
-            # Lógica de Git: Clona se não existir, senão atualiza
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/${{ github.repository }}.git .
-            else
-              git pull origin main
-            fi
+                    # Lógica de Git: Clona se não existir, senão atualiza
+                    if [ ! -d ".git" ]; then
+                    git clone https://github.com/${{ github.repository }}.git .
+                    else
+                    git pull origin main
+                    fi
 
-            # Sobe os containers (Caddy + Flask)
-            # O --build garante que o Dockerfile do Flask seja reconstruído se houver mudanças no código
-            docker compose up -d --build
+                    # Sobe os containers (Caddy + Flask)
+                    # O --build garante que o Dockerfile do Flask seja reconstruído se houver mudanças no código
+                    docker compose up -d --build
