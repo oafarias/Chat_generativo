@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button id="btn-chat-nao" class="btn-secondary" style="padding: 6px 16px; font-size: 13px;">Não</button>
             </div>
         `;
-        addMessage(msgInicial, "bot", false); // false = não salva essa msg interativa no banco
+        addMessage(msgInicial, "bot", false, true, true); // false = não salva essa msg interativa no banco
 
         setTimeout(() => {
             const btnChatSim = document.getElementById('btn-chat-sim');
@@ -159,9 +159,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 4. Função Adicionar Mensagens (Agora conectada ao DB)
-    function addMessage(text, type, salvarBD = true, tocarSom = true) {
-        // Traduz o Markdown para HTML usando a biblioteca Marked
-        let msgTextoFormatado = marked.parse(text); 
+    function addMessage(text, type, salvarBD = true, tocarSom = true, isHTML = false) {
+        let msgTextoFormatado;
+
+        if (isHTML) {
+            // Se for HTML proposital (botões), não passa pelo marked
+            msgTextoFormatado = text;
+        } else {
+            // Se for mensagem da IA ou usuário, usa Markdown
+            msgTextoFormatado = marked.parse(text);
+        }
         
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
@@ -179,7 +186,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             playNotification();
         }
 
-        // Se for mensagem oficial do fluxo, joga pro Django salvar
         if (salvarBD) {
             apiSalvarMensagem(type, text);
         }
