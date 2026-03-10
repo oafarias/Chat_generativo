@@ -10,6 +10,16 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 </head>
 <body>
+    <div id="lgpd-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Termos de Uso e Cookies 🍪</h3>
+            <p>Para continuarmos o atendimento e personalizarmos sua experiência, utilizamos cookies para armazenar sua sessão por 24 horas. Você concorda em fornecer informações pessoais para seguirmos com o atendimento?</p>
+            <div class="modal-buttons">
+                <button id="btn-lgpd-sim" class="btn-primary">Sim, concordo</button>
+                <button id="btn-lgpd-nao" class="btn-secondary">Não</button>
+            </div>
+        </div>
+    </div>    
     <div class="chat-wrapper">
         <header class="chat-header">
             <img src="https://mkbr.xgen.com.br/mkbr/chatng/assets/img/logo-cliente.aiwa.png" alt="Aiwa Logo" class="logo">
@@ -22,14 +32,7 @@
         </header>
 
         <main class="chat-messages" id="chat-box">
-            <div class="message bot">
-                <img src="https://mkbr.xgen.com.br/mkbr/chatng/assets/img/avatar-aiwa.png" class="avatar">
-                <div class="bubble">
-                    O seu protocolo para este atendimento é: <span id="protocolo"></span>.<br>
-                    Para que possamos seguir com o atendimento precisamos de alguns dados pessoais. O Sr(a). Está de acordo?
-                </div>
-                <span class="time">16:45</span>
-            </div>
+            
         </main>
 
         <emoji-picker id="emoji-picker-box" class="emoji-picker-hidden"></emoji-picker>

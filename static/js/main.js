@@ -4,13 +4,108 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const protocoloSpan = document.getElementById('protocolo');
+    const lgpdModal = document.getElementById('lgpd-modal');
+    const btnSim = document.getElementById('btn-lgpd-sim');
+    const btnNao = document.getElementById('btn-lgpd-nao');
     const emojiBtn = document.getElementById('emoji-btn');
     const emojiPickerBox = document.getElementById('emoji-picker-box');
     const volumeBtn = document.getElementById('volume-btn');
 
     let isMuted = false;
+    let userHasConsented = false;
 
-    // 2. Lógica do Protocolo (Data + 6 dígitos aleatórios)
+    userInput.disabled = true; // Desabilita o input até o usuário consentir
+    sendBtn.disabled = true;
+
+    // 2. Lógica LGPD
+    function checkCookieConsent() {
+        if (document.cookie.includes("lgpd_consent=true")) {
+            lgpdModal.style.display = "none";
+            unlockChat();
+        } else {
+            lgpdModal.style.display = "flex";
+        }
+    }
+
+    function unlockChat() {
+        userHasConsented = true;
+        
+        // Mantém o input de texto bloqueado até ele responder a pergunta do bot
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        
+        playNotification(); 
+        
+        // Monta a mensagem com os botões embutidos
+        const msgInicial = `
+            Você concorda em fornecer informações pessoais para continuarmos o atendimento?<br><br>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="btn-chat-sim" class="btn-primary" style="padding: 6px 16px; font-size: 13px;">Sim</button>
+                <button id="btn-chat-nao" class="btn-secondary" style="padding: 6px 16px; font-size: 13px;">Não</button>
+            </div>
+        `;
+        addMessage(msgInicial, "bot");
+
+        // Adiciona os eventos para os botões que acabaram de ser criados no chat
+        setTimeout(() => {
+            const btnChatSim = document.getElementById('btn-chat-sim');
+            const btnChatNao = document.getElementById('btn-chat-nao');
+
+            if (btnChatSim) {
+                btnChatSim.addEventListener('click', () => {
+                    // Oculta os botões após o clique
+                    btnChatSim.parentElement.style.display = 'none';
+                    addMessage("Sim", "user");
+
+                    // Libera o campo de digitação
+                    userInput.disabled = false;
+                    sendBtn.disabled = false;
+                    userInput.focus();
+
+                    // Gera o protocolo e segue o fluxo
+                    const novoProtocolo = gerarProtocolo();
+                    setTimeout(() => {
+                        addMessage(`O seu protocolo para este atendimento é: <strong>${novoProtocolo}</strong>.<br>Para prosseguirmos com o atendimento, me informe o seu nome.`, "bot");
+                    }, 800);
+                });
+            }
+
+            if (btnChatNao) {
+                btnChatNao.addEventListener('click', () => {
+                    btnChatNao.parentElement.style.display = 'none';
+                    addMessage("Não", "user");
+                    setTimeout(() => {
+                        addMessage("Sem o consentimento, não podemos prosseguir com o atendimento. Recarregue a página caso mude de ideia.", "bot");
+                    }, 800);
+                });
+            }
+        }, 100);
+    }
+
+    btnSim.addEventListener('click', () => {
+        const d = new Date();
+        d.setTime(d.getTime() + (24*60*60*1000));
+        document.cookie = `lgpd_consent=true;expires=${d.toUTCString()};path=/`;
+        lgpdModal.style.display = "none";
+        unlockChat();
+    });
+
+    btnNao.addEventListener('click', () => {
+        alert("Para prosseguir com o atendimento, precisamos do seu consentimento para uso de dados essenciais.");
+    });
+
+    checkCookieConsent();
+
+    // 3. Sistema de Som 
+    function playNotification() {
+        if (!isMuted && userHasConsented) {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+            audio.volume = 0.4;
+            audio.play().catch(e => console.log("Áudio pendente de interação."));
+        }
+    }
+
+    // 4. Lógica do Protocolo
     function gerarProtocolo() {
         const agora = new Date();
         const dataPrefix = agora.getFullYear() + 
@@ -20,22 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${dataPrefix}${randomValidacao}`;
     }
 
-    if (protocoloSpan) {
-        protocoloSpan.innerText = gerarProtocolo();
-    }
+    
+    
 
-    // 3. Sistema de Som
-    function playNotification() {
-        if (!isMuted) {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
-            audio.volume = 0.4;
-            audio.play().catch(() => {
-                console.log("Áudio bloqueado pelo navegador. Interaja com a página primeiro.");
-            });
-        }
-    }
-
-    // 4. Função para Adicionar Mensagens
+    // 5. Função para Adicionar Mensagens
     function addMessage(text, type) {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const msgDiv = document.createElement('div');
@@ -53,14 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 5. Eventos de Envio
+    // 6. Eventos de Envio
     sendBtn.addEventListener('click', () => {
         const text = userInput.value.trim();
         if (text) {
             addMessage(text, 'user');
             userInput.value = '';
             
-            // Simulação de resposta do Bot
             setTimeout(() => {
                 if(text.toLowerCase().includes('sim')) {
                     addMessage("Para prosseguirmos com o atendimento, me informe o seu nome.", "bot");
@@ -73,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') sendBtn.click();
     });
 
-    // 6. Lógica de Volume
+    // 7. Lógica de Volume
     if (volumeBtn) {
         volumeBtn.addEventListener('click', () => {
             isMuted = !isMuted;
@@ -82,9 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. Lógica do Seletor de Emojis
+    // 8. Lógica do Seletor de Emojis
     if (emojiBtn && emojiPickerBox) {
-        // Garante que comece escondido
         emojiPickerBox.classList.add('emoji-picker-hidden');
 
         emojiBtn.addEventListener('click', (e) => {
@@ -92,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             emojiPickerBox.classList.toggle('emoji-picker-hidden');
         });
 
-        // Fecha ao clicar fora
         document.addEventListener('click', () => {
             emojiPickerBox.classList.add('emoji-picker-hidden');
         });
@@ -109,4 +189,4 @@ document.addEventListener('DOMContentLoaded', () => {
             userInput.focus();
         });
     }
-});
+})

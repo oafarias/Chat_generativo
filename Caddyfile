@@ -1,3 +1,8 @@
+#redireciona a pagina de admin
+admin.aaleff.me {
+    redir https://aaleff.me/admin/
+}
+
 # Redireciona www para root
 www.aaleff.me {
     redir https://aaleff.me{uri}
