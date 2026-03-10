@@ -160,9 +160,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Função Adicionar Mensagens (Agora conectada ao DB)
     function addMessage(text, type, salvarBD = true, tocarSom = true) {
-        let msgTextoFormatado = text;
+        // Traduz o Markdown para HTML usando a biblioteca Marked
+        let msgTextoFormatado = marked.parse(text); 
         
-        // Se for restauração, a hora vem do banco, senão gera na hora
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
         const msgDiv = document.createElement('div');

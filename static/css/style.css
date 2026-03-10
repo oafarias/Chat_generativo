@@ -90,3 +90,12 @@ emoji-picker {
 .btn-primary:hover { background: #b3151b; }
 .btn-secondary { background: #e0e0e0; color: #333; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s;}
 .btn-secondary:hover { background: #ccc; }
+
+.bubble p {
+    margin: 0;
+    display: inline;
+}
+.bubble p + p {
+    display: block;
+    margin-top: 8px;
+}
