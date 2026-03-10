@@ -36,11 +36,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function apiSalvarMensagem(remetente, texto) {
-        await fetch('/api/chat/', {
+        const res = await fetch('/api/chat/', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ acao: 'mensagem', remetente: remetente, texto: texto })
         });
+        return await res.json(); // <-- Agora ela devolve o que o bot falou
     }
     // ==========================================
 
@@ -185,20 +186,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 5. Eventos de Envio
-    sendBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', async () => {
         const text = userInput.value.trim();
         if (text) {
-            addMessage(text, 'user', true); // Salva input do usuario
+            addMessage(text, 'user', false); // Coloca na tela (o backend já vai salvar)
             userInput.value = '';
             
-            setTimeout(() => {
-                if(text.toLowerCase().includes('sim')) {
-                    // Aqui sua IA vai assumir depois, isso é só o mock
-                    addMessage("Entendido, prosseguindo com o atendimento...", "bot", true);
-                } else {
-                    addMessage("Recebi sua mensagem. Em que posso ajudar?", "bot", true);
-                }
-            }, 1000);
+            // Adiciona um aviso de "digitando..." ou apenas aguarda
+            const retorno = await apiSalvarMensagem('user', text);
+            
+            if (retorno && retorno.resposta) {
+                addMessage(retorno.resposta, 'bot', false); // Coloca a resposta real do Gemini na tela!
+            }
         }
     });
 

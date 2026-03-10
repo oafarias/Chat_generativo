@@ -29,3 +29,24 @@ class Mensagem(models.Model):
 
     def __str__(self):
         return f"{self.get_remetente_display()} - {self.texto[:30]}..."
+    
+class ProvedorIA(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Provedor (ex: OpenAI, Google)")
+    modelo = models.CharField(max_length=100, verbose_name="Modelo (ex: gpt-4o)")
+    api_key = models.CharField(max_length=255, verbose_name="API Key")
+
+    def __str__(self):
+        return f"{self.nome} ({self.modelo})"
+
+    class Meta:
+        verbose_name = "Provedor de IA"
+        verbose_name_plural = "Provedores de IA"
+
+class Agente(models.Model):
+    nome = models.CharField(max_length=100, verbose_name="Nome do Agente")
+    provedor = models.ForeignKey(ProvedorIA, on_delete=models.SET_NULL, null=True, verbose_name="Provedor")
+    system_prompt = models.TextField(verbose_name="System Prompt", help_text="Aja como... Seu objetivo é...")
+    temperatura = models.FloatField(default=0.7, help_text="0.0 (Focado/Rígido) a 1.0 (Muito Criativo)")
+
+    def __str__(self):
+        return self.nome

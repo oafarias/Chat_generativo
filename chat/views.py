@@ -1,8 +1,10 @@
 import json
+from google import genai
+from google.genai import types
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Acesso, Sessao, Mensagem
+from .models import Acesso, Sessao, Mensagem, Agente
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -44,15 +46,42 @@ def api_chat(request):
             return JsonResponse({'status': 'ok'})
 
         elif acao == 'mensagem':
-            # Salva a mensagem direto na sessão vinculada
             protocolo = request.session.get('protocolo_ativo')
             if protocolo:
                 sessao = Sessao.objects.get(protocolo=protocolo)
-                Mensagem.objects.create(
-                    sessao=sessao,
-                    remetente=data.get('remetente'),
-                    texto=data.get('texto')
+                texto_usuario = data.get('texto')
+
+                Mensagem.objects.create(sessao=sessao, remetente='user', texto=texto_usuario)
+
+                agente = Agente.objects.first()
+                if not agente:
+                    return JsonResponse({'status': 'erro', 'resposta': 'Agente offline.'})
+
+                # 1. Inicia o cliente novo da API
+                client = genai.Client(api_key=agente.provedor.api_key)
+                
+                # 2. Configura a sua criatividade (System Prompt e Temperatura)
+                config = types.GenerateContentConfig(
+                    system_instruction=agente.system_prompt,
+                    temperature=agente.temperatura,
                 )
-                return JsonResponse({'status': 'ok'})
+
+                # 3. Chama a IA
+                historico = []
+                for msg in sessao.mensagens.all().order_by('enviado_em'):
+                    papel = 'user' if msg.remetente == 'user' else 'model'
+                    historico.append(types.Content(role=papel, parts=[types.Part.from_text(text=msg.texto)]))
+                try:
+                    resposta_api = client.models.generate_content(
+                        model=agente.provedor.modelo,
+                        contents=historico,
+                        config=config
+                    )
+                    texto_bot = resposta_api.text
+                except Exception as e:
+                    texto_bot = f"Meu cérebro falhou: {e}"
+
+                Mensagem.objects.create(sessao=sessao, remetente='bot', texto=texto_bot)
+                return JsonResponse({'status': 'ok', 'resposta': texto_bot})
                 
         return JsonResponse({'status': 'erro'})

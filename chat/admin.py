@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Acesso, Sessao, Mensagem
+from .models import Acesso, Sessao, Mensagem, ProvedorIA, Agente
 
 @admin.register(Acesso)
 class AcessoAdmin(admin.ModelAdmin):
@@ -33,3 +33,11 @@ class MensagemAdmin(admin.ModelAdmin):
     def resumo_texto(self, obj):
         return obj.texto[:50] + '...' if len(obj.texto) > 50 else obj.texto
     resumo_texto.short_description = 'Mensagem'
+
+@admin.register(ProvedorIA)
+class ProvedorIAAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'modelo')
+
+@admin.register(Agente)
+class AgenteAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'provedor', 'temperatura')

@@ -38,7 +38,6 @@ jobs:
             docker compose down
             docker compose up -d --build
 
-            # 5. AUTOMAÇÃO: Roda as migrations para criar as tabelas no banco
-            echo "Rodando migrations e collectstatic..."
-            docker compose exec -T web python manage.py migrate --noinput
-            docker compose exec -T web python manage.py collectstatic --noinput
+            # 5. Limpeza de imagens antigas (Para não encher o disco da sua Droplet)
+            echo "Limpando imagens antigas..."
+            docker image prune -f
