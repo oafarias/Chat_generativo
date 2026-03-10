@@ -11,6 +11,7 @@ services:
       - aaleff_network
     volumes:
       - static_volume:/app/staticfiles
+      - db_volume:/app/db_data
 
   caddy:
     image: caddy:latest
@@ -37,3 +38,4 @@ volumes:
   caddy_data:
   caddy_config:
   static_volume:
+  db_volume:
