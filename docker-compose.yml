@@ -6,6 +6,9 @@ services:
     # para o mundo externo, o Caddy cuidará disso.
     expose:
       - "5000"
+    environment:
+      - DJANGO_SECRET_KEY=${"DJANGO_SECRET_KEY", os.getenv("DJANGO_SECRET_KEY")}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-False}
     restart: always
     networks:
       - aaleff_network
