@@ -16,29 +16,26 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            # 1. Limpeza de diretórios antigos (Legacy)
-            rm -rf ~/app-teste ~/app-flask
+            script: |
             mkdir -p ~/app
             cd ~/app
 
-            # 2. Lógica de Git
+            # Lógica de Git: Força a sincronia com o novo histórico
             if [ ! -d ".git" ]; then
-              echo "Clonando repositório..."
               git clone https://github.com/${{ github.repository }}.git .
             else
-              echo "Atualizando código..."
-              git pull origin main
+              git fetch origin main
+              git reset --hard origin/main
             fi
 
-            # 3. FAXINA: Mata containers órfãos que possam estar segurando a porta 80
+            # Limpeza de containers antigos
             docker stop $(docker ps -q) 2>/dev/null || true
             docker rm $(docker ps -aq) 2>/dev/null || true
 
-            # 4. Sobe a versão nova do Django
+            # Sobe a aplicação
+            # Nota: O comando migrate agora roda sem comentários na linha
             docker compose run -e DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} web python manage.py migrate
             docker compose down
             docker compose up -d --build
 
-            # 5. Limpeza de imagens antigas (Para não encher o disco da sua Droplet)
-            echo "Limpando imagens antigas..."
             docker image prune -f
