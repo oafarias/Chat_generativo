@@ -19,7 +19,6 @@ jobs:
             mkdir -p ~/app
             cd ~/app
 
-            # Lógica de Git: Força a sincronia com o novo histórico
             if [ ! -d ".git" ]; then
               git clone https://github.com/${{ github.repository }}.git .
             else
@@ -27,14 +26,12 @@ jobs:
               git reset --hard origin/main
             fi
 
-            # Limpeza de containers antigos
             docker stop $(docker ps -q) 2>/dev/null || true
             docker rm $(docker ps -aq) 2>/dev/null || true
 
-            # Sobe a aplicação
-            # Nota: O comando migrate agora roda sem comentários na linha
+            # Comando sem parenteses ou comentarios na mesma linha
             docker compose run -e DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} web python manage.py migrate
+            
             docker compose down
             docker compose up -d --build
-
             docker image prune -f
