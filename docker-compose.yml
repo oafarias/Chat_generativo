@@ -7,7 +7,7 @@ services:
     expose:
       - "5000"
     environment:
-      - DJANGO_SECRET_KEY=${"DJANGO_SECRET_KEY", os.getenv("DJANGO_SECRET_KEY")}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG:-False}
     restart: always
     networks:

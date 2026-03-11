@@ -18,19 +18,16 @@ jobs:
           script: |
             mkdir -p ~/app
             cd ~/app
-
             if [ ! -d ".git" ]; then
               git clone https://github.com/${{ github.repository }}.git .
             else
               git fetch origin main
               git reset --hard origin/main
             fi
-
             docker stop $(docker ps -q) 2>/dev/null || true
             docker rm $(docker ps -aq) 2>/dev/null || true
-
-            # Comando sem parenteses ou comentarios na mesma linha
-            docker compose run -e DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} web python manage.py migrate
+            
+            docker compose run -e DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" web python manage.py migrate
             
             docker compose down
             docker compose up -d --build
