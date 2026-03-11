@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+
+
 class Acesso(models.Model):
     ip = models.GenericIPAddressField(verbose_name="Endereço IP")
     data_hora = models.DateTimeField(auto_now_add=True, verbose_name="Data e Hora")
@@ -13,6 +15,10 @@ class Acesso(models.Model):
         verbose_name = "Acesso"
         verbose_name_plural = "Acessos"
         ordering = ['-data_hora']
+    
+    @property
+    def data_hora_formatada(self):
+        return self.data_hora.strftime("%d/%m/%Y %H:%M:%S")
 
 class Sessao(models.Model):
     protocolo = models.CharField(max_length=20, unique=True, verbose_name="Número do Protocolo")
@@ -37,6 +43,11 @@ class Mensagem(models.Model):
     texto = models.TextField()
     enviado_em = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Mensagem"
+        verbose_name_plural = "💬 Mensagens"
+
+
     def __str__(self):
         return f"{self.get_remetente_display()} - {self.texto[:30]}..."
     
@@ -50,7 +61,7 @@ class ProvedorIA(models.Model):
 
     class Meta:
         verbose_name = "Provedor de IA"
-        verbose_name_plural = "Provedores de IA"
+        verbose_name_plural = "🔗 Provedores de IA"
 
 class Agente(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome do Agente")
@@ -63,4 +74,4 @@ class Agente(models.Model):
     
     class Meta:
         verbose_name = "Agente"
-        verbose_name_plural = "Config: Agentes"
+        verbose_name_plural = "🤖 Agentes de IA"

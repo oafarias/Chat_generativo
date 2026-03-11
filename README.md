@@ -6,9 +6,10 @@ Sistema de atendimento inteligente utilizando Django, Docker e Google Gemini API
 1. Ative o ambiente virtual: `source .venv/bin/activate` (ou via Script no Windows).
 2. Instale as dependências: `pip install -r requirements.txt`
 3. Crie a pasta do banco: `mkdir db_data` (Essencial para não dar erro de SQLite).
-4. Migre o banco: `python manage.py migrate`
-5. Crie seu acesso: `python manage.py createsuperuser`
-6. Rode: `python manage.py runserver 5000`
+4. Crie o banco: `python manage.py makemigrations`
+5. Migre o banco: `python manage.py migrate`
+6. Crie seu acesso: `python manage.py createsuperuser` # Opcional. Se quiser listar os usuarios rode no terminal o comando `python manage.py shell -c "from django.contrib.auth.models import User; print('\n'.join([f'- {u.username} (ID: {u.id}, Staff: {u.is_staff})' for u in User.objects.all()]))"`
+7. Rode: `python manage.py runserver 5000`
 
 ## 🐳 Como Rodar em Produção (Docker)
 O deploy é automático via GitHub Actions, mas para subir manualmente:
