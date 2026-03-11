@@ -8,6 +8,11 @@ class Acesso(models.Model):
 
     def __str__(self):
         return f"Acesso #{self.id} | IP: {self.ip} | {self.data_hora.strftime('%d/%m %H:%M')}"
+    
+    class Meta:
+        verbose_name = "Acesso"
+        verbose_name_plural = "Acessos"
+        ordering = ['-data_hora']
 
 class Sessao(models.Model):
     protocolo = models.CharField(max_length=20, unique=True, verbose_name="Número do Protocolo")
@@ -16,6 +21,11 @@ class Sessao(models.Model):
 
     def __str__(self):
         return f"Protocolo: {self.protocolo}"
+    
+    class Meta:
+        verbose_name = "Sessão de Chat"
+        verbose_name_plural = "Sessões de Chat"
+        ordering = ['-criado_em']
 
 class Mensagem(models.Model):
     REMETENTE_CHOICES = [
@@ -50,3 +60,7 @@ class Agente(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    class Meta:
+        verbose_name = "Agente"
+        verbose_name_plural = "Config: Agentes"
