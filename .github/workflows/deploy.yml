@@ -16,7 +16,6 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            script: |
             mkdir -p ~/app
             cd ~/app
 
